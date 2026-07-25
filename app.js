@@ -75,11 +75,23 @@ window.createGameRoom = async function(){
         });
 
 
-        document.getElementById("code").innerHTML =
+        localStorage.setItem("roomCode", code);
 
-        "🎉 تم إنشاء القعدة<br><br>" +
 
-        "🔑 الكود: " + code;
+document.getElementById("code").innerHTML =
+
+"🎉 تم إنشاء القعدة<br><br>" +
+
+"🔑 الكود: " + code +
+
+"<br><br>سيتم دخول الغرفة...";
+
+
+setTimeout(()=>{
+
+    window.location.href = "room.html";
+
+},2000);
 
 
     }
