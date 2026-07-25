@@ -8,7 +8,32 @@ function createRoom(){
 
 function joinRoom(){
 
-    alert("🔑 صفحة دخول القعدة قريبا!");
+    window.location.href = "join-room.html";
+
+}
+
+
+
+function joinGameRoom(){
+
+    let name = document.getElementById("joinName").value;
+
+    let code = document.getElementById("roomCode").value;
+
+
+    if(name === "" || code === ""){
+
+        alert("اكتب اسمك وكود القعدة");
+
+        return;
+
+    }
+
+
+    document.getElementById("joinResult").innerHTML =
+    "✅ تم طلب الدخول للقعدة<br>" +
+    "اللاعب: " + name +
+    "<br>الكود: " + code;
 
 }
 
