@@ -1,5 +1,4 @@
 import { db } from "./firebase.js";
-console.log("Gaada Firebase يعمل");
 
 import {
     collection,
@@ -7,49 +6,42 @@ import {
     query,
     where,
     getDocs,
-    serverTimestamp
+    serverTimestamp,
+    updateDoc,
+    doc,
+    arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
 // الصفحة الرئيسية
 
 window.createRoom = function(){
-
     window.location.href = "create-room.html";
-
 };
 
 
 window.joinRoom = function(){
-
     window.location.href = "join-room.html";
-
 };
 
 
 window.games = function(){
-
     alert("🎮 الألعاب ستضاف قريبًا");
-
 };
 
 
 
-// إنشاء قعدة جديدة
+// إنشاء قعدة
 
 window.createGameRoom = async function(){
 
     const player = document.getElementById("playerName").value;
-
     const roomName = document.getElementById("roomName").value;
 
 
     if(player === "" || roomName === ""){
-
         alert("اكتب اسمك واسم القعدة");
-
         return;
-
     }
 
 
@@ -58,16 +50,13 @@ window.createGameRoom = async function(){
 
     try {
 
-
-        await addDoc(collection(db, "rooms"), {
+        await addDoc(collection(db,"rooms"),{
 
             owner: player,
-
             roomName: roomName,
-
             code: code,
 
-            players: [
+            players:[
                 player
             ],
 
@@ -79,26 +68,19 @@ window.createGameRoom = async function(){
         localStorage.setItem("roomCode", code);
 
 
-document.getElementById("code").innerHTML =
-
-"🎉 تم إنشاء القعدة<br><br>" +
-
-"🔑 الكود: " + code +
-
-"<br><br>سيتم دخول الغرفة...";
+        document.getElementById("code").innerHTML =
+        "🎉 تم إنشاء القعدة<br><br>" +
+        "🔑 الكود: " + code;
 
 
-setTimeout(()=>{
+        setTimeout(()=>{
 
-    window.location.href = "room.html";
+            window.location.href="room.html";
 
-},2000);
-
-
-    }
+        },2000);
 
 
-    catch(error){
+    } catch(error){
 
         console.log(error);
 
@@ -106,21 +88,23 @@ setTimeout(()=>{
 
     }
 
-
 };
 
 
 
 
 
-// دخول قعدة بالكود
+// دخول القعدة
 
 window.joinGameRoom = async function(){
 
 
-    const name = document.getElementById("joinName").value;
+    const name =
+    document.getElementById("joinName").value;
 
-    const code = document.getElementById("roomCode").value;
+
+    const code =
+    document.getElementById("roomCode").value;
 
 
 
@@ -134,12 +118,9 @@ window.joinGameRoom = async function(){
 
 
 
-    const rooms = collection(db,"rooms");
-
-
     const q = query(
 
-        rooms,
+        collection(db,"rooms"),
 
         where(
             "code",
@@ -157,11 +138,8 @@ window.joinGameRoom = async function(){
 
     if(result.empty){
 
-
         document.getElementById("joinResult").innerHTML =
-
-        "❌ الكود غير صحيح";
-
+        "❌ الكود غير موجود";
 
         return;
 
@@ -169,11 +147,38 @@ window.joinGameRoom = async function(){
 
 
 
+    const roomDoc = result.docs[0];
+
+
+
+    await updateDoc(
+
+        doc(db,"rooms",roomDoc.id),
+
+        {
+
+            players: arrayUnion(name)
+
+        }
+
+    );
+
+
+
+    localStorage.setItem("roomCode", code);
+
+
+
     document.getElementById("joinResult").innerHTML =
+    "✅ تم الدخول للقعدة";
 
-    "✅ تم العثور على القعدة<br>" +
 
-    "أهلاً " + name + " 🎮";
+    setTimeout(()=>{
+
+        window.location.href="room.html";
+
+    },1500);
+
 
 
 };
