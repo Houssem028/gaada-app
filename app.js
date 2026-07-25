@@ -3,42 +3,44 @@ import { db } from "./firebase.js";
 import {
     collection,
     addDoc,
+    query,
+    where,
+    getDocs,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
-// زر إنشاء القعدة
-function createRoom(){
+// الصفحة الرئيسية
+
+window.createRoom = function(){
 
     window.location.href = "create-room.html";
 
-}
+};
 
 
-// زر دخول القعدة
-function joinRoom(){
+window.joinRoom = function(){
 
     window.location.href = "join-room.html";
 
-}
+};
 
 
-// الألعاب
-function games(){
+window.games = function(){
 
     alert("🎮 الألعاب ستضاف قريبًا");
 
-}
+};
 
 
 
-// إنشاء غرفة حقيقية في Firebase
+// إنشاء قعدة جديدة
 
 window.createGameRoom = async function(){
 
-    let player = document.getElementById("playerName").value;
+    const player = document.getElementById("playerName").value;
 
-    let roomName = document.getElementById("roomName").value;
+    const roomName = document.getElementById("roomName").value;
 
 
     if(player === "" || roomName === ""){
@@ -50,18 +52,23 @@ window.createGameRoom = async function(){
     }
 
 
-    let code = Math.floor(100000 + Math.random() * 900000);
+    const code = Math.floor(100000 + Math.random() * 900000);
 
 
     try {
 
+
         await addDoc(collection(db, "rooms"), {
 
-            playerName: player,
+            owner: player,
 
             roomName: roomName,
 
             code: code,
+
+            players: [
+                player
+            ],
 
             createdAt: serverTimestamp()
 
@@ -69,16 +76,91 @@ window.createGameRoom = async function(){
 
 
         document.getElementById("code").innerHTML =
-        "🎉 تم إنشاء القعدة<br>" +
-        "الكود: " + code;
 
+        "🎉 تم إنشاء القعدة<br><br>" +
 
-    } catch(error){
+        "🔑 الكود: " + code;
 
-        console.log(error);
-
-        alert("حدث خطأ في إنشاء القعدة");
 
     }
 
-}
+
+    catch(error){
+
+        console.log(error);
+
+        alert("حدث خطأ");
+
+    }
+
+
+};
+
+
+
+
+
+// دخول قعدة بالكود
+
+window.joinGameRoom = async function(){
+
+
+    const name = document.getElementById("joinName").value;
+
+    const code = document.getElementById("roomCode").value;
+
+
+
+    if(name === "" || code === ""){
+
+        alert("اكتب الاسم والكود");
+
+        return;
+
+    }
+
+
+
+    const rooms = collection(db,"rooms");
+
+
+    const q = query(
+
+        rooms,
+
+        where(
+            "code",
+            "==",
+            Number(code)
+        )
+
+    );
+
+
+
+    const result = await getDocs(q);
+
+
+
+    if(result.empty){
+
+
+        document.getElementById("joinResult").innerHTML =
+
+        "❌ الكود غير صحيح";
+
+
+        return;
+
+    }
+
+
+
+    document.getElementById("joinResult").innerHTML =
+
+    "✅ تم العثور على القعدة<br>" +
+
+    "أهلاً " + name + " 🎮";
+
+
+};
