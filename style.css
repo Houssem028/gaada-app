@@ -120,3 +120,47 @@ body{
     font-size:14px;
 
 }
+.input{
+
+    width:90%;
+    max-width:350px;
+
+    padding:18px;
+
+    margin:10px;
+
+    border:none;
+
+    border-radius:20px;
+
+    background:#222;
+
+    color:white;
+
+    font-size:18px;
+
+    text-align:center;
+
+    outline:none;
+
+}
+
+
+.input::placeholder{
+
+    color:#aaa;
+
+}
+
+
+#code{
+
+    margin-top:25px;
+
+    font-size:25px;
+
+    color:#ff9800;
+
+    font-weight:bold;
+
+}
