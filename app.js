@@ -1,3 +1,13 @@
+import { db } from "./firebase.js";
+
+import {
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+
+// زر إنشاء القعدة
 function createRoom(){
 
     window.location.href = "create-room.html";
@@ -5,7 +15,7 @@ function createRoom(){
 }
 
 
-
+// زر دخول القعدة
 function joinRoom(){
 
     window.location.href = "join-room.html";
@@ -13,49 +23,25 @@ function joinRoom(){
 }
 
 
-
-function joinGameRoom(){
-
-    let name = document.getElementById("joinName").value;
-
-    let code = document.getElementById("roomCode").value;
-
-
-    if(name === "" || code === ""){
-
-        alert("اكتب اسمك وكود القعدة");
-
-        return;
-
-    }
-
-
-    document.getElementById("joinResult").innerHTML =
-    "✅ تم طلب الدخول للقعدة<br>" +
-    "اللاعب: " + name +
-    "<br>الكود: " + code;
-
-}
-
-
-
+// الألعاب
 function games(){
 
-    alert("🎮 قائمة الألعاب قريبا!");
+    alert("🎮 الألعاب ستضاف قريبًا");
 
 }
 
 
 
-// إنشاء كود القعدة
+// إنشاء غرفة حقيقية في Firebase
 
-function createGameRoom(){
+window.createGameRoom = async function(){
 
     let player = document.getElementById("playerName").value;
-    let room = document.getElementById("roomName").value;
+
+    let roomName = document.getElementById("roomName").value;
 
 
-    if(player === "" || room === ""){
+    if(player === "" || roomName === ""){
 
         alert("اكتب اسمك واسم القعدة");
 
@@ -67,9 +53,32 @@ function createGameRoom(){
     let code = Math.floor(100000 + Math.random() * 900000);
 
 
-    document.getElementById("code").innerHTML =
-    "كود القعدة: " + code +
-    "<br>شارك الكود مع أصحابك 👥";
+    try {
 
+        await addDoc(collection(db, "rooms"), {
+
+            playerName: player,
+
+            roomName: roomName,
+
+            code: code,
+
+            createdAt: serverTimestamp()
+
+        });
+
+
+        document.getElementById("code").innerHTML =
+        "🎉 تم إنشاء القعدة<br>" +
+        "الكود: " + code;
+
+
+    } catch(error){
+
+        console.log(error);
+
+        alert("حدث خطأ في إنشاء القعدة");
+
+    }
 
 }
