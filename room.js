@@ -8,7 +8,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
-// نقرأ الكود المحفوظ مؤقتًا
 const roomCode = localStorage.getItem("roomCode");
 
 
@@ -21,14 +20,9 @@ if(!roomCode){
 
 
 
-// البحث عن القعدة وعرضها
-
-const roomsRef = collection(db,"rooms");
-
-
 const q = query(
 
-    roomsRef,
+    collection(db,"rooms"),
 
     where(
         "code",
@@ -49,7 +43,6 @@ onSnapshot(q,(snapshot)=>{
         const data = doc.data();
 
 
-
         document.getElementById("roomTitle").innerHTML =
         "☕ " + data.roomName;
 
@@ -60,13 +53,32 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        document.getElementById("players").innerHTML =
-        "👑 " + data.owner;
+        let playersHTML = "";
 
+
+        data.players.forEach((player,index)=>{
+
+
+            if(index === 0){
+
+                playersHTML += "👑 " + player + "<br>";
+
+            } else {
+
+                playersHTML += "👤 " + player + "<br>";
+
+            }
+
+
+        });
+
+
+
+        document.getElementById("players").innerHTML =
+        playersHTML;
 
 
     });
-
 
 
 });
