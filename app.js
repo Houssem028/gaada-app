@@ -66,6 +66,7 @@ window.createGameRoom = async function(){
 
 
         localStorage.setItem("roomCode", code);
+        localStorage.setItem("playerName", name);
 
 
         document.getElementById("code").innerHTML =
