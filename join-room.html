@@ -1,132 +1,60 @@
-// دخول قعدة بالكود
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-window.joinGameRoom = async function(){
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    const name = document.getElementById("joinName").value.trim();
+<title>دخول قعدة - ڨعدة</title>
 
-    const code = Number(
-        document.getElementById("roomCode").value
-    );
+<link rel="stylesheet" href="style.css">
 
+</head>
 
 
-    if(!name || !code){
+<body>
 
-        alert("اكتب الاسم والكود");
 
-        return;
+<div class="container">
 
-    }
 
+<div class="logo">
+ڨعدة 🎮
+</div>
 
 
-    try{
+<div class="slogan">
+ادخل كود أصحابك وانضم للقعدة
+</div>
 
 
-        const rooms = collection(db,"rooms");
+<input 
+id="joinName"
+class="input"
+placeholder="اسمك">
 
 
+<input 
+id="roomCode"
+class="input"
+placeholder="كود القعدة">
 
-        const q = query(
 
-            rooms,
+<button class="btn" onclick="joinGameRoom()">
+دخول القعدة
+</button>
 
-            where(
-                "code",
-                "==",
-                code
-            )
 
-        );
+<div id="joinResult"></div>
 
 
+</div>
 
-        const result = await getDocs(q);
 
+<script src="app.js"></script>
 
 
-        if(result.empty){
+</body>
 
-
-            document.getElementById("joinResult").innerHTML =
-
-            "❌ الكود غير صحيح";
-
-
-            return;
-
-        }
-
-
-
-        const room = result.docs[0];
-
-
-
-        // إضافة اللاعب إلى الغرفة
-
-        await updateDoc(
-
-            doc(db,"rooms",room.id),
-
-            {
-
-                players: arrayUnion(name)
-
-            }
-
-        );
-
-
-
-        // حفظ بيانات اللاعب
-
-        localStorage.setItem(
-            "roomCode",
-            code
-        );
-
-
-        localStorage.setItem(
-            "playerName",
-            name
-        );
-
-
-
-        document.getElementById("joinResult").innerHTML =
-
-        "✅ تم العثور على القعدة<br>" +
-
-        "👤 أهلاً " + name + "<br>" +
-
-        "🚀 جاري الدخول...";
-
-
-
-        setTimeout(()=>{
-
-
-            window.location.href = "room.html";
-
-
-        },1000);
-
-
-
-    }catch(error){
-
-
-        console.log(error);
-
-
-        alert(
-            "حدث خطأ: " + error.message
-        );
-
-
-    }
-
-
-};
+</html>
