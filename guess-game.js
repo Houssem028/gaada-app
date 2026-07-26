@@ -24,6 +24,21 @@ let hearts = 3;
 
 
 
+// اختيار لاعبين مختلفين
+function getTwoDifferentPlayers() {
+
+    const first = randomPlayer([]);
+    let second = randomPlayer([first.name]);
+
+    while (second.name === first.name) {
+        second = randomPlayer([first.name]);
+    }
+
+    return {
+        first,
+        second
+    };
+}
 
 // جلب الغرفة
 
