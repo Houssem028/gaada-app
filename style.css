@@ -115,3 +115,112 @@ body{
     background:#ffc107;
 
 }
+/* ===== الدردشة ===== */
+
+
+.chat-container{
+
+    width:90%;
+
+    max-width:400px;
+
+    margin-top:20px;
+
+}
+
+
+
+.chat-container h3{
+
+    text-align:center;
+
+    margin-bottom:10px;
+
+}
+
+
+
+.messages{
+
+    width:100%;
+
+    height:300px;
+
+    overflow-y:auto;
+
+    background:#1b1b1b;
+
+    border-radius:20px;
+
+    padding:15px;
+
+    border:1px solid #333;
+
+}
+
+
+
+/* الرسائل */
+
+.message{
+
+    background:#ff9800;
+
+    color:#111;
+
+    padding:10px 15px;
+
+    border-radius:18px;
+
+    margin-bottom:10px;
+
+    font-size:16px;
+
+    word-break:break-word;
+
+}
+
+
+
+/* مكان الكتابة */
+
+.chat-input{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-top:10px;
+
+}
+
+
+
+.chat-input .input{
+
+    flex:1;
+
+    margin:0;
+
+}
+
+
+
+/* تحسين شريط التمرير */
+
+.messages::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+
+.messages::-webkit-scrollbar-thumb{
+
+    background:#ff9800;
+
+    border-radius:10px;
+
+}
