@@ -7,7 +7,10 @@ import {
     onSnapshot,
     updateDoc,
     doc,
-    arrayRemove
+    arrayRemove,
+    addDoc,
+    orderBy,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
@@ -24,6 +27,8 @@ const q = query(
     collection(db,"rooms"),
     where("code","==",roomCode)
 );
+
+
 
 
 
@@ -96,6 +101,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+
         // التحكم بالهوست
 
         const hostControls =
@@ -110,10 +116,7 @@ onSnapshot(q,(snapshot)=>{
         if(playerName === data.owner){
 
 
-            // هوست
-
             hostControls.style.display = "block";
-
 
             waiting.innerHTML =
             "👑 أنت مدير القعدة";
@@ -122,10 +125,7 @@ onSnapshot(q,(snapshot)=>{
         }else{
 
 
-            // لاعب
-
             hostControls.style.display = "none";
-
 
             waiting.innerHTML =
             "⏳ بانتظار المدير لاختيار اللعبة";
@@ -135,10 +135,151 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+        // تشغيل الدردشة
+
+        loadMessages(roomId);
+
+
+
     });
 
 
 });
+
+
+
+
+
+
+
+
+// تحميل الرسائل
+
+function loadMessages(id){
+
+
+    const messagesRef = collection(
+        db,
+        "rooms",
+        id,
+        "messages"
+    );
+
+
+    const q = query(
+        messagesRef,
+        orderBy("time","asc")
+    );
+
+
+
+    onSnapshot(q,(snapshot)=>{
+
+
+        let html = "";
+
+
+
+        snapshot.forEach((msg)=>{
+
+
+            const data = msg.data();
+
+
+
+            html += `
+
+            <div class="message">
+
+            <b>👤 ${data.sender}</b><br>
+
+            ${data.text}
+
+            </div>
+
+            `;
+
+
+        });
+
+
+
+        document.getElementById("messages").innerHTML =
+
+        html || "لا توجد رسائل بعد";
+
+
+
+        const box =
+        document.getElementById("messages");
+
+
+        box.scrollTop = box.scrollHeight;
+
+
+
+    });
+
+
+}
+
+
+
+
+
+
+
+
+// إرسال رسالة
+
+window.sendMessage = async function(){
+
+
+    const input =
+    document.getElementById("messageInput");
+
+
+    const text =
+    input.value.trim();
+
+
+
+    if(!text || !roomId){
+
+        return;
+
+    }
+
+
+
+    await addDoc(
+
+        collection(
+            db,
+            "rooms",
+            roomId,
+            "messages"
+        ),
+
+        {
+
+            sender: playerName,
+
+            text: text,
+
+            time: serverTimestamp()
+
+        }
+
+    );
+
+
+
+    input.value = "";
+
+};
+
+
 
 
 
@@ -155,16 +296,6 @@ window.leaveRoom = async function(){
     if(!roomId){
 
         alert("الغرفة غير جاهزة");
-
-        return;
-
-    }
-
-
-
-    if(!playerName){
-
-        alert("اسم اللاعب غير موجود");
 
         return;
 
@@ -205,6 +336,7 @@ window.leaveRoom = async function(){
         console.log(error);
 
         alert("حدث خطأ في الخروج");
+
 
     }
 
