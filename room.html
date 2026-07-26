@@ -54,7 +54,7 @@
 
 
 
-<!-- هذا يظهر للهوست فقط -->
+<!-- اختيار اللعبة للهوست فقط -->
 
 <div id="hostControls" style="display:none;">
 
@@ -72,11 +72,60 @@
 
 
 
-<!-- هذا يظهر للاعبين -->
-
 <div id="waitingMessage">
 
 </div>
+
+
+
+
+
+<!-- الدردشة -->
+
+<div class="chat-container">
+
+
+<h3>
+💬 دردشة القعدة
+</h3>
+
+
+
+<div id="messages" class="messages">
+
+لا توجد رسائل بعد
+
+</div>
+
+
+
+
+<div class="chat-input">
+
+
+<input
+
+id="messageInput"
+
+class="input"
+
+placeholder="اكتب رسالة...">
+
+
+<button class="btn" onclick="sendMessage()">
+
+📩
+
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
 
 
 
@@ -89,14 +138,6 @@
 </button>
 
 
-
-
-
-<button class="btn">
-
-💬 الدردشة
-
-</button>
 
 
 
