@@ -371,6 +371,58 @@ window.selectGame = async function(game){
 window.startGame = async function(){
 
 
+    if(!roomId){
+
+        return;
+
+    }
+
+
+
+    // جلب بيانات الغرفة للتأكد من عدد اللاعبين
+
+    const snap = await getDoc(
+        doc(db,"rooms",roomId)
+    );
+
+
+    const data = snap.data();
+
+
+    const players = data.players || [];
+
+
+
+    if(players.length < 2){
+
+
+        alert("⚠️ تحتاج لاعبين اثنين لبدء لعبة التخمين");
+
+
+        return;
+
+    }
+
+
+
+    await updateDoc(
+
+        doc(db,"rooms",roomId),
+
+        {
+
+            gameStatus:"started",
+
+            currentGame:"guess"
+
+        }
+
+    );
+
+
+};
+
+
 
     if(!roomId){
 
