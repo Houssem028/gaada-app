@@ -11,10 +11,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
-
 const roomCode = Number(localStorage.getItem("roomCode"));
 const playerName = localStorage.getItem("playerName");
-
 
 let roomId = null;
 
@@ -31,9 +29,7 @@ onSnapshot(q,(snapshot)=>{
 
 
     if(snapshot.empty){
-
         return;
-
     }
 
 
@@ -58,7 +54,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        let players = data.players || [];
+        const players = data.players || [];
 
 
 
@@ -67,20 +63,20 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        let html="";
+        let html = "";
 
 
 
         players.forEach((p,index)=>{
 
 
-            if(index===0){
+            if(index === 0){
 
-                html += "👑 "+p+" (المدير)<br>";
+                html += "👑 " + p + " (المدير)<br>";
 
             }else{
 
-                html += "👤 "+p+"<br>";
+                html += "👤 " + p + "<br>";
 
             }
 
@@ -93,7 +89,6 @@ onSnapshot(q,(snapshot)=>{
         html || "لا يوجد لاعبين";
 
 
-
     });
 
 
@@ -103,41 +98,56 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+// حذف اللاعب
+
+async function removePlayer(){
+
+
+    if(!roomId || !playerName){
+        return;
+    }
+
+
+
+    try{
+
+
+        await updateDoc(
+
+            doc(db,"rooms",roomId),
+
+            {
+
+                players: arrayRemove(playerName)
+
+            }
+
+        );
+
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+
+}
+
+
+
+
+
+// زر الخروج
+
 window.leaveRoom = async function(){
 
 
-    if(!roomId){
-
-        alert("الغرفة غير جاهزة");
-        return;
-
-    }
-
-
-    if(!playerName){
-
-        alert("اسم اللاعب غير موجود");
-        return;
-
-    }
-
-
-
-    await updateDoc(
-
-        doc(db,"rooms",roomId),
-
-        {
-
-            players: arrayRemove(playerName)
-
-        }
-
-    );
-
+    await removePlayer();
 
 
     localStorage.removeItem("roomCode");
+
     localStorage.removeItem("playerName");
 
 
@@ -145,3 +155,16 @@ window.leaveRoom = async function(){
 
 
 };
+
+
+
+
+// محاولة حذف اللاعب عند إغلاق الصفحة
+
+window.addEventListener("beforeunload",()=>{
+
+
+    removePlayer();
+
+
+});
