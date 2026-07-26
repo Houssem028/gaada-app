@@ -35,9 +35,7 @@ onSnapshot(q,(snapshot)=>{
 
 
     if(snapshot.empty){
-
         return;
-
     }
 
 
@@ -52,6 +50,8 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+        // معلومات القعدة
+
         document.getElementById("roomTitle").innerHTML =
         "☕ " + data.roomName;
 
@@ -61,6 +61,9 @@ onSnapshot(q,(snapshot)=>{
         "🔑 الكود: " + data.code;
 
 
+
+
+        // اللاعبين
 
         const players = data.players || [];
 
@@ -100,6 +103,9 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+
+        // الهوست
+
         const hostControls =
         document.getElementById("hostControls");
 
@@ -126,20 +132,84 @@ onSnapshot(q,(snapshot)=>{
 
 
             waiting.innerHTML =
-            "⏳ بانتظار المدير لاختيار اللعبة";
+            "⏳ بانتظار المدير";
 
 
         }
 
 
 
-        // تشغيل الدردشة
+
+
+
+
+        // عرض اللعبة
+
+        const gameInfo =
+        document.getElementById("gameInfo");
+
+
+
+        if(data.game){
+
+
+            gameInfo.innerHTML =
+
+            "🎮 اللعبة الحالية: <b>" 
+            + data.game +
+            "</b>";
+
+
+
+        }else{
+
+
+            gameInfo.innerHTML =
+            "🎮 لم يتم اختيار لعبة بعد";
+
+
+        }
+
+
+
+
+
+
+
+        // زر بدء اللعبة للهوست
+
+        const startBtn =
+        document.getElementById("startGameBtn");
+
+
+
+        if(data.game && playerName === data.owner){
+
+
+            startBtn.style.display="block";
+
+
+        }else{
+
+
+            startBtn.style.display="none";
+
+
+        }
+
+
+
+
+
+
+
+        // الدردشة
 
         if(!chatLoaded){
 
             loadMessages(roomId);
 
-            chatLoaded = true;
+            chatLoaded=true;
 
         }
 
@@ -157,31 +227,138 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-// عرض الرسائل
+
+// فتح قائمة الألعاب
+
+window.showGames=function(){
+
+
+    document.getElementById("gameMenu").style.display="block";
+
+
+};
+
+
+
+
+
+
+
+
+
+// اختيار اللعبة
+
+window.selectGame = async function(game){
+
+
+
+    if(!roomId){
+
+        return;
+
+    }
+
+
+
+    await updateDoc(
+
+        doc(db,"rooms",roomId),
+
+        {
+
+            game:game,
+
+            gameStatus:"waiting"
+
+        }
+
+    );
+
+
+
+    document.getElementById("gameMenu").style.display="none";
+
+
+};
+
+
+
+
+
+
+
+
+
+// بدء اللعبة
+
+window.startGame = async function(){
+
+
+
+    await updateDoc(
+
+        doc(db,"rooms",roomId),
+
+        {
+
+            gameStatus:"started"
+
+        }
+
+    );
+
+
+
+    alert("🚀 بدأت اللعبة");
+
+
+};
+
+
+
+
+
+
+
+
+
+// تحميل الرسائل
 
 function loadMessages(id){
 
 
+
     const messagesRef = collection(
+
         db,
+
         "rooms",
+
         id,
+
         "messages"
+
     );
+
 
 
 
     const q = query(
+
         messagesRef,
+
         orderBy("time","asc")
+
     );
+
+
 
 
 
     onSnapshot(q,(snapshot)=>{
 
 
-        let html = "";
+        let html="";
 
 
 
@@ -209,12 +386,16 @@ function loadMessages(id){
 
 
 
+
+
         document.getElementById("messages").innerHTML =
+
         html || "لا توجد رسائل بعد";
 
 
 
     });
+
 
 
 }
@@ -232,24 +413,18 @@ function loadMessages(id){
 window.sendMessage = async function(){
 
 
-    const input = document.getElementById("messageInput");
 
-
-    const text = input.value.trim();
-
-
-
-    if(text === ""){
-
-        return;
-
-    }
+    const input =
+    document.getElementById("messageInput");
 
 
 
-    if(!roomId){
+    const text =
+    input.value.trim();
 
-        alert("لم يتم العثور على الغرفة");
+
+
+    if(!text || !roomId){
 
         return;
 
@@ -257,45 +432,38 @@ window.sendMessage = async function(){
 
 
 
-    try{
+
+    await addDoc(
+
+        collection(
+
+            db,
+
+            "rooms",
+
+            roomId,
+
+            "messages"
+
+        ),
+
+        {
+
+            sender:playerName,
+
+            text:text,
+
+            time:serverTimestamp()
+
+        }
+
+    );
 
 
-        await addDoc(
-
-            collection(
-                db,
-                "rooms",
-                roomId,
-                "messages"
-            ),
-
-            {
-
-                sender: playerName,
-
-                text: text,
-
-                time: serverTimestamp()
-
-            }
-
-        );
 
 
+    input.value="";
 
-        input.value = "";
-
-
-
-    }catch(error){
-
-
-        console.log(error);
-
-        alert(error.message);
-
-
-    }
 
 
 };
@@ -308,7 +476,7 @@ window.sendMessage = async function(){
 
 
 
-// خروج من القعدة
+// الخروج
 
 window.leaveRoom = async function(){
 
@@ -324,42 +492,27 @@ window.leaveRoom = async function(){
 
 
 
-    try{
+    await updateDoc(
 
+        doc(db,"rooms",roomId),
 
-        await updateDoc(
+        {
 
-            doc(db,"rooms",roomId),
+            players:arrayRemove(playerName)
 
-            {
+        }
 
-                players: arrayRemove(playerName)
-
-            }
-
-        );
+    );
 
 
 
-        localStorage.removeItem("roomCode");
+    localStorage.removeItem("roomCode");
 
-        localStorage.removeItem("playerName");
-
-
-
-        window.location.href="index.html";
+    localStorage.removeItem("playerName");
 
 
 
-    }catch(error){
-
-
-        console.log(error);
-
-        alert("حدث خطأ في الخروج");
-
-
-    }
+    window.location.href="index.html";
 
 
 };
