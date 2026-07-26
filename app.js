@@ -23,124 +23,7 @@ window.createRoom = function(){
 };
 
 
-// دخول قعدة بالكود
-
-window.joinGameRoom = async function(){
-
-
-    const name = document.getElementById("joinName").value.trim();
-
-    const code = Number(
-        document.getElementById("roomCode").value
-    );
-
-
-
-    if(name === "" || code === 0){
-
-        alert("اكتب الاسم والكود");
-
-        return;
-
-    }
-
-
-
-    try{
-
-
-        const rooms = collection(db,"rooms");
-
-
-
-        const q = query(
-
-            rooms,
-
-            where(
-                "code",
-                "==",
-                code
-            )
-
-        );
-
-
-
-        const result = await getDocs(q);
-
-
-
-        if(result.empty){
-
-
-            document.getElementById("joinResult").innerHTML =
-
-            "❌ الكود غير صحيح";
-
-
-            return;
-
-        }
-
-
-
-        const room = result.docs[0];
-
-
-
-        // حفظ بيانات اللاعب
-
-        localStorage.setItem(
-            "roomCode",
-            code
-        );
-
-
-        localStorage.setItem(
-            "playerName",
-            name
-        );
-
-
-
-        document.getElementById("joinResult").innerHTML =
-
-        "✅ تم العثور على القعدة<br>" +
-
-        "👤 أهلاً " + name + "<br>" +
-
-        "🚀 دخول الغرفة...";
-
-
-
-        // الانتقال للغرفة
-
-        setTimeout(function(){
-
-
-            window.location.href = "./room.html";
-
-
-        },1000);
-
-
-
-    }catch(error){
-
-
-        console.log(error);
-
-
-        document.getElementById("joinResult").innerHTML =
-
-        "❌ خطأ: " + error.message;
-
-
-    }
-
-
-};
+window.joinRoom = function(){
 
     window.location.href = "join-room.html";
 
@@ -187,39 +70,31 @@ window.createGameRoom = async function(){
     try{
 
 
-        await addDoc(
+        await addDoc(collection(db,"rooms"),{
 
-            collection(db,"rooms"),
+            owner: player,
 
-            {
+            roomName: roomName,
 
-                owner: player,
+            code: code,
 
-                roomName: roomName,
+            players:[
+                player
+            ],
 
-                code: code,
+            createdAt: serverTimestamp()
 
-                players:[player],
-
-                createdAt: serverTimestamp()
-
-            }
-
-        );
+        });
 
 
 
         localStorage.setItem("roomCode", code);
-
         localStorage.setItem("playerName", player);
 
 
 
         document.getElementById("code").innerHTML =
-
-        "🎉 تم إنشاء القعدة<br><br>" +
-
-        "🔑 الكود: " + code;
+        "🎉 تم إنشاء القعدة<br><br>🔑 الكود: " + code;
 
 
 
@@ -233,9 +108,7 @@ window.createGameRoom = async function(){
 
     }catch(error){
 
-        console.log(error);
-
-        alert("خطأ: "+error.message);
+        alert(error.message);
 
     }
 
@@ -248,16 +121,13 @@ window.createGameRoom = async function(){
 
 
 
-
 // دخول القعدة
 
 window.joinGameRoom = async function(){
 
 
-
     const name =
     document.getElementById("joinName").value.trim();
-
 
 
     const code =
@@ -266,7 +136,6 @@ window.joinGameRoom = async function(){
 
 
     if(!name || !code){
-
 
         alert("اكتب الاسم والكود");
 
@@ -295,10 +164,8 @@ window.joinGameRoom = async function(){
 
         if(result.empty){
 
-
             document.getElementById("joinResult").innerHTML =
-            "❌ القعدة غير موجودة";
-
+            "❌ الكود غير موجود";
 
             return;
 
@@ -309,8 +176,6 @@ window.joinGameRoom = async function(){
         const roomDoc = result.docs[0];
 
 
-
-        // إضافة اللاعب للغرفة
 
         await updateDoc(
 
@@ -326,34 +191,20 @@ window.joinGameRoom = async function(){
 
 
 
-        // حفظ البيانات
+        localStorage.setItem("roomCode",code);
 
-        localStorage.setItem(
-            "roomCode",
-            code
-        );
-
-
-        localStorage.setItem(
-            "playerName",
-            name
-        );
+        localStorage.setItem("playerName",name);
 
 
 
         document.getElementById("joinResult").innerHTML =
-
-        "✅ تم الدخول للقعدة<br>" +
-
-        "جاري فتح الغرفة...";
+        "✅ تم الدخول للقعدة<br>🚀 جاري فتح الغرفة...";
 
 
 
         setTimeout(()=>{
 
-
             window.location.href="room.html";
-
 
         },1000);
 
@@ -361,11 +212,7 @@ window.joinGameRoom = async function(){
 
     }catch(error){
 
-
-        console.log(error);
-
-        alert("خطأ في الدخول: "+error.message);
-
+        alert("خطأ: " + error.message);
 
     }
 
