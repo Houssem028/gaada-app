@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>خمن اللاعب ⚽</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<div class="logo">
+⚽ خمن اللاعب
+</div>
+
+
+
+<h2>
+🎯 لعبة التخمين
+</h2>
+
+
+
+<div id="playerImageBox">
+
+
+<img id="secretPlayerImage"
+src=""
+alt="لاعب"
+style="width:220px;height:220px;border-radius:20px;object-fit:cover;">
+
+
+</div>
+
+
+
+
+<h3 id="hearts">
+
+❤️❤️❤️
+
+</h3>
+
+
+
+
+<div id="gameMessage">
+
+جاري تحميل اللاعب...
+
+</div>
+
+
+
+
+<input
+
+id="guessInput"
+
+class="input"
+
+placeholder="اكتب اسم اللاعب">
+
+
+
+
+
+<button class="btn" onclick="checkGuess()">
+
+🎯 تخمين
+
+</button>
+
+
+
+
+
+<button class="btn" onclick="newRound()">
+
+🔄 جولة جديدة
+
+</button>
+
+
+
+
+
+<h3 id="score">
+
+🏆 الانتصارات
+
+</h3>
+
+
+
+
+</div>
+
+
+
+<script type="module" src="guess-game.js"></script>
+
+
+</body>
+
+</html>
