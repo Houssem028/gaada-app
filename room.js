@@ -2,45 +2,40 @@ import { db } from "./firebase.js";
 
 import {
     collection,
-    onSnapshot,
     query,
-    where
+    where,
+    onSnapshot,
+    updateDoc,
+    doc,
+    arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
-const roomCode = localStorage.getItem("roomCode");
-
-
-if(!roomCode){
-
-    document.getElementById("roomTitle").innerHTML =
-    "❌ لا توجد قعدة";
-
-}
-
+const roomCode = Number(localStorage.getItem("roomCode"));
+const playerName = localStorage.getItem("playerName");
 
 
 const q = query(
-
-    collection(db,"rooms"),
-
-    where(
-        "code",
-        "==",
-        Number(roomCode)
-    )
-
+    collection(db, "rooms"),
+    where("code", "==", roomCode)
 );
 
 
 
-onSnapshot(q,(snapshot)=>{
+let roomId = null;
 
 
-    snapshot.forEach((doc)=>{
+
+onSnapshot(q, (snapshot)=>{
 
 
-        const data = doc.data();
+    snapshot.forEach((room)=>{
+
+
+        roomId = room.id;
+
+        const data = room.data();
+
 
 
         document.getElementById("roomTitle").innerHTML =
@@ -53,25 +48,8 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        let playersHTML = "";
+        let list = "";
 
-if(data.players){
-
-data.players.forEach((player,index)=>{
-
-if(index === 0){
-
-playersHTML += "👑 " + player + "<br>";
-
-}else{
-
-playersHTML += "👤 " + player + "<br>";
-
-}
-
-});
-
-}
 
 
         data.players.forEach((player,index)=>{
@@ -79,11 +57,11 @@ playersHTML += "👤 " + player + "<br>";
 
             if(index === 0){
 
-                playersHTML += "👑 " + player + "<br>";
+                list += "👑 " + player + "<br>";
 
-            } else {
+            }else{
 
-                playersHTML += "👤 " + player + "<br>";
+                list += "👤 " + player + "<br>";
 
             }
 
@@ -92,11 +70,50 @@ playersHTML += "👤 " + player + "<br>";
 
 
 
-        document.getElementById("players").innerHTML =
-        playersHTML;
+        document.getElementById("players").innerHTML = list;
+
 
 
     });
 
 
 });
+
+
+
+
+
+// خروج من القعدة
+
+window.leaveRoom = async function(){
+
+
+    if(!roomId || !playerName){
+
+        return;
+
+    }
+
+
+    await updateDoc(
+
+        doc(db,"rooms",roomId),
+
+        {
+
+            players: arrayRemove(playerName)
+
+        }
+
+    );
+
+
+    localStorage.removeItem("roomCode");
+
+    localStorage.removeItem("playerName");
+
+
+    window.location.href="index.html";
+
+
+};
