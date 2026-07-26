@@ -7,10 +7,13 @@ body{
 
     margin:0;
 
-    background:linear-gradient(
-        180deg,
+    min-height:100vh;
+
+    background:
+    linear-gradient(
+        135deg,
         #111,
-        #1c1c1c
+        #242424
     );
 
     color:white;
@@ -47,9 +50,10 @@ body{
 
     color:#ff9800;
 
-    text-shadow:0 0 20px #ff9800;
-
     margin-bottom:15px;
+
+    text-shadow:
+    0 0 20px #ff9800;
 
 }
 
@@ -57,7 +61,7 @@ body{
 
 .slogan{
 
-    font-size:20px;
+    font-size:22px;
 
     color:#ddd;
 
@@ -77,21 +81,26 @@ body{
 
     padding:18px;
 
-    margin:12px;
+    margin:10px;
+
 
     border:none;
 
     border-radius:30px;
 
+
     background:#ff9800;
 
     color:#111;
+
 
     font-size:22px;
 
     font-weight:bold;
 
+
     cursor:pointer;
+
 
     transition:0.3s;
 
@@ -104,63 +113,5 @@ body{
     transform:scale(1.05);
 
     background:#ffc107;
-
-}
-
-
-
-.footer{
-
-    position:absolute;
-
-    bottom:20px;
-
-    color:#777;
-
-    font-size:14px;
-
-}
-.input{
-
-    width:90%;
-    max-width:350px;
-
-    padding:18px;
-
-    margin:10px;
-
-    border:none;
-
-    border-radius:20px;
-
-    background:#222;
-
-    color:white;
-
-    font-size:18px;
-
-    text-align:center;
-
-    outline:none;
-
-}
-
-
-.input::placeholder{
-
-    color:#aaa;
-
-}
-
-
-#code{
-
-    margin-top:25px;
-
-    font-size:25px;
-
-    color:#ff9800;
-
-    font-weight:bold;
 
 }
