@@ -14,27 +14,44 @@ import {
 const roomCode = Number(localStorage.getItem("roomCode"));
 const playerName = localStorage.getItem("playerName");
 
-
-const q = query(
-    collection(db, "rooms"),
-    where("code", "==", roomCode)
-);
-
-
-
 let roomId = null;
 
 
 
-onSnapshot(q, (snapshot)=>{
+if(!roomCode){
+
+    alert("لا توجد قعدة");
+
+}
 
 
-    snapshot.forEach((room)=>{
+
+// جلب الغرفة
+
+const q = query(
+    collection(db,"rooms"),
+    where("code","==",roomCode)
+);
 
 
-        roomId = room.id;
 
-        const data = room.data();
+onSnapshot(q,(snapshot)=>{
+
+
+    if(snapshot.empty){
+
+        return;
+
+    }
+
+
+    snapshot.forEach((item)=>{
+
+
+        roomId = item.id;
+
+
+        const data = item.data();
 
 
 
@@ -48,20 +65,29 @@ onSnapshot(q, (snapshot)=>{
 
 
 
-        let list = "";
+        let players = data.players || [];
 
 
 
-        data.players.forEach((player,index)=>{
+        document.getElementById("playerCount").innerHTML =
+        "👥 اللاعبين (" + players.length + ")";
+
+
+
+        let html = "";
+
+
+
+        players.forEach((player,index)=>{
 
 
             if(index === 0){
 
-                list += "👑 " + player + "<br>";
+                html += "👑 " + player + "<br>";
 
             }else{
 
-                list += "👤 " + player + "<br>";
+                html += "👤 " + player + "<br>";
 
             }
 
@@ -70,8 +96,8 @@ onSnapshot(q, (snapshot)=>{
 
 
 
-        document.getElementById("players").innerHTML = list;
-
+        document.getElementById("players").innerHTML =
+        html || "لا يوجد لاعبين";
 
 
     });
@@ -82,17 +108,32 @@ onSnapshot(q, (snapshot)=>{
 
 
 
-
-// خروج من القعدة
+// زر الخروج
 
 window.leaveRoom = async function(){
 
 
-    if(!roomId || !playerName){
+    console.log("خروج من القعدة");
+
+
+
+    if(!roomId){
+
+        alert("لم يتم العثور على الغرفة");
 
         return;
 
     }
+
+
+    if(!playerName){
+
+        alert("اسم اللاعب غير موجود");
+
+        return;
+
+    }
+
 
 
     await updateDoc(
@@ -108,8 +149,8 @@ window.leaveRoom = async function(){
     );
 
 
-    localStorage.removeItem("roomCode");
 
+    localStorage.removeItem("roomCode");
     localStorage.removeItem("playerName");
 
 
