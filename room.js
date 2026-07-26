@@ -63,6 +63,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+
         // اللاعبين
 
         const players = data.players || [];
@@ -104,7 +105,8 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        // الهوست
+
+        // تحكم الهوست
 
         const hostControls =
         document.getElementById("hostControls");
@@ -143,7 +145,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        // عرض اللعبة
+        // عرض اللعبة للجميع
 
         const gameInfo =
         document.getElementById("gameInfo");
@@ -155,8 +157,8 @@ onSnapshot(q,(snapshot)=>{
 
             gameInfo.innerHTML =
 
-            "🎮 اللعبة الحالية: <b>" 
-            + data.game +
+            "🎮 اللعبة الحالية: <b>" +
+            data.game +
             "</b>";
 
 
@@ -183,16 +185,22 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        if(data.game && playerName === data.owner){
+        if(startBtn){
 
 
-            startBtn.style.display="block";
+            if(data.game && playerName === data.owner){
 
 
-        }else{
+                startBtn.style.display="block";
 
 
-            startBtn.style.display="none";
+            }else{
+
+
+                startBtn.style.display="none";
+
+
+            }
 
 
         }
@@ -203,7 +211,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        // الدردشة
+        // تحميل الدردشة مرة واحدة
 
         if(!chatLoaded){
 
@@ -230,10 +238,21 @@ onSnapshot(q,(snapshot)=>{
 
 // فتح قائمة الألعاب
 
-window.showGames=function(){
+window.showGames = function(){
 
 
-    document.getElementById("gameMenu").style.display="block";
+    const menu =
+    document.getElementById("gameMenu");
+
+
+
+    if(menu){
+
+
+        menu.style.display="block";
+
+
+    }
 
 
 };
@@ -254,29 +273,55 @@ window.selectGame = async function(game){
 
     if(!roomId){
 
+        alert("الغرفة غير موجودة");
+
         return;
 
     }
 
 
 
-    await updateDoc(
+    try{
 
-        doc(db,"rooms",roomId),
 
-        {
+        await updateDoc(
 
-            game:game,
+            doc(db,"rooms",roomId),
 
-            gameStatus:"waiting"
+            {
+
+                game:game,
+
+                gameStatus:"waiting"
+
+            }
+
+        );
+
+
+
+        const menu =
+        document.getElementById("gameMenu");
+
+
+
+        if(menu){
+
+            menu.style.display="none";
 
         }
 
-    );
 
 
+    }catch(error){
 
-    document.getElementById("gameMenu").style.display="none";
+
+        console.log(error);
+
+        alert(error.message);
+
+
+    }
 
 
 };
@@ -292,6 +337,14 @@ window.selectGame = async function(game){
 // بدء اللعبة
 
 window.startGame = async function(){
+
+
+
+    if(!roomId){
+
+        return;
+
+    }
 
 
 
@@ -342,7 +395,6 @@ function loadMessages(id){
 
 
 
-
     const q = query(
 
         messagesRef,
@@ -358,7 +410,7 @@ function loadMessages(id){
     onSnapshot(q,(snapshot)=>{
 
 
-        let html="";
+        let html = "";
 
 
 
@@ -388,9 +440,17 @@ function loadMessages(id){
 
 
 
-        document.getElementById("messages").innerHTML =
+        const box =
+        document.getElementById("messages");
 
-        html || "لا توجد رسائل بعد";
+
+
+        if(box){
+
+            box.innerHTML =
+            html || "لا توجد رسائل بعد";
+
+        }
 
 
 
@@ -461,7 +521,6 @@ window.sendMessage = async function(){
 
 
 
-
     input.value="";
 
 
@@ -476,7 +535,7 @@ window.sendMessage = async function(){
 
 
 
-// الخروج
+// الخروج من القعدة
 
 window.leaveRoom = async function(){
 
