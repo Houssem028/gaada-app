@@ -13,6 +13,23 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
+// الصفحة الرئيسية
+
+window.createRoom = function(){
+    window.location.href = "create-room.html";
+};
+
+
+window.joinRoom = function(){
+    window.location.href = "join-room.html";
+};
+
+
+window.games = function(){
+    alert("🎮 الألعاب ستضاف قريبًا");
+};
+
+
 
 // إنشاء قعدة
 
@@ -23,10 +40,8 @@ window.createGameRoom = async function(){
 
 
     if(player === "" || roomName === ""){
-
         alert("اكتب اسمك واسم القعدة");
         return;
-
     }
 
 
@@ -38,9 +53,7 @@ window.createGameRoom = async function(){
         await addDoc(collection(db,"rooms"),{
 
             owner: player,
-
             roomName: roomName,
-
             code: code,
 
             players:[
@@ -52,10 +65,8 @@ window.createGameRoom = async function(){
         });
 
 
-
         localStorage.setItem("roomCode", code);
-        localStorage.setItem("playerName", player);
-
+        localStorage.setItem("playerName", name);
 
 
         document.getElementById("code").innerHTML =
@@ -65,17 +76,16 @@ window.createGameRoom = async function(){
 
         setTimeout(()=>{
 
-            window.location.href = "room.html";
+            window.location.href="room.html";
 
-        },1500);
-
+        },2000);
 
 
     } catch(error){
 
         console.log(error);
 
-        alert("خطأ: " + error.message);
+        alert("حدث خطأ");
 
     }
 
@@ -85,18 +95,24 @@ window.createGameRoom = async function(){
 
 
 
-// دخول قعدة
+// دخول القعدة
 
 window.joinGameRoom = async function(){
 
-    const name = document.getElementById("joinName").value;
-    const code = document.getElementById("roomCode").value;
+
+    const name =
+    document.getElementById("joinName").value;
+
+
+    const code =
+    document.getElementById("roomCode").value;
 
 
 
     if(name === "" || code === ""){
 
         alert("اكتب الاسم والكود");
+
         return;
 
     }
@@ -132,13 +148,13 @@ window.joinGameRoom = async function(){
 
 
 
-    const room = result.docs[0];
+    const roomDoc = result.docs[0];
 
 
 
     await updateDoc(
 
-        doc(db,"rooms",room.id),
+        doc(db,"rooms",roomDoc.id),
 
         {
 
@@ -151,7 +167,6 @@ window.joinGameRoom = async function(){
 
 
     localStorage.setItem("roomCode", code);
-    localStorage.setItem("playerName", name);
 
 
 
@@ -163,7 +178,8 @@ window.joinGameRoom = async function(){
 
         window.location.href="room.html";
 
-    },1000);
+    },1500);
+
 
 
 };
