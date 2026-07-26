@@ -55,6 +55,24 @@ onSnapshot(q,(snapshot)=>{
 
         let playersHTML = "";
 
+if(data.players){
+
+data.players.forEach((player,index)=>{
+
+if(index === 0){
+
+playersHTML += "👑 " + player + "<br>";
+
+}else{
+
+playersHTML += "👤 " + player + "<br>";
+
+}
+
+});
+
+}
+
 
         data.players.forEach((player,index)=>{
 
