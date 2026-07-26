@@ -52,7 +52,7 @@
 
 
 
-<!-- تحكم الهوست فقط -->
+<!-- منطقة الهوست -->
 
 <div id="hostControls" style="display:none;">
 
@@ -64,6 +64,11 @@
 
 
 <div id="gameMenu" style="display:none;">
+
+
+<h3>
+اختر اللعبة 🎮
+</h3>
 
 
 <button class="btn" onclick="selectGame('تحديات وأسئلة')">
@@ -81,13 +86,15 @@
 </button>
 
 
+
 </div>
 
 
 
+
 <button 
-id="startGameBtn" 
-class="btn" 
+id="startGameBtn"
+class="btn"
 style="display:none;"
 onclick="startGame()">
 
@@ -96,11 +103,14 @@ onclick="startGame()">
 </button>
 
 
+
 </div>
 
 
 
 
+
+<!-- عرض اللعبة للجميع -->
 
 <div id="gameInfo">
 
@@ -115,6 +125,8 @@ onclick="startGame()">
 <div id="waitingMessage">
 
 </div>
+
+
 
 
 
@@ -139,20 +151,20 @@ onclick="startGame()">
 
 
 
+
 <div class="chat-input">
 
 
 <input
-
 id="messageInput"
-
 class="input"
-
 placeholder="اكتب رسالة...">
 
 
 
-<button class="btn" onclick="sendMessage()">
+<button 
+class="btn"
+onclick="sendMessage()">
 
 📩
 
@@ -162,6 +174,7 @@ placeholder="اكتب رسالة...">
 </div>
 
 
+
 </div>
 
 
@@ -170,7 +183,10 @@ placeholder="اكتب رسالة...">
 
 
 
-<button class="btn" onclick="leaveRoom()">
+
+<button 
+class="btn"
+onclick="leaveRoom()">
 
 🚪 خروج من القعدة
 
@@ -181,6 +197,7 @@ placeholder="اكتب رسالة...">
 
 
 </div>
+
 
 
 
