@@ -2,163 +2,121 @@ import { db } from "./firebase.js";
 
 import {
     collection,
-    addDoc,
     query,
     where,
-    getDocs,
-    serverTimestamp,
+    onSnapshot,
     updateDoc,
     doc,
-    arrayUnion
+    arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
-// الصفحة الرئيسية
+const roomCode = Number(localStorage.getItem("roomCode"));
+const playerName = localStorage.getItem("playerName");
 
-window.createRoom = function(){
-    window.location.href = "create-room.html";
-};
-
-
-window.joinRoom = function(){
-    window.location.href = "join-room.html";
-};
-
-
-window.games = function(){
-    alert("🎮 الألعاب ستضاف قريبًا");
-};
+let roomId = null;
 
 
 
-// إنشاء قعدة
-
-window.createGameRoom = async function(){
-
-    const player = document.getElementById("playerName").value;
-    const roomName = document.getElementById("roomName").value;
+const q = query(
+    collection(db,"rooms"),
+    where("code","==",roomCode)
+);
 
 
-    if(player === "" || roomName === ""){
-        alert("اكتب اسمك واسم القعدة");
-        return;
-    }
+
+onSnapshot(q,(snapshot)=>{
 
 
-    const code = Math.floor(100000 + Math.random() * 900000);
+    snapshot.forEach((room)=>{
 
 
-    try {
+        roomId = room.id;
 
-        await addDoc(collection(db,"rooms"),{
+        const data = room.data();
 
-            owner: player,
-            roomName: roomName,
-            code: code,
 
-            players:[
-                player
-            ],
+        document.getElementById("roomTitle").innerHTML =
+        "☕ " + data.roomName;
 
-            createdAt: serverTimestamp()
+
+        document.getElementById("roomCode").innerHTML =
+        "🔑 الكود: " + data.code;
+
+
+
+        const players = data.players || [];
+
+
+
+        document.getElementById("playerCount").innerHTML =
+        "👥 اللاعبين (" + players.length + ")";
+
+
+
+        let list = "";
+
+
+        players.forEach((player,index)=>{
+
+
+            if(index === 0){
+
+                list += "👑 " + player + " (المدير)<br>";
+
+            }else{
+
+                list += "👤 " + player + "<br>";
+
+            }
+
 
         });
 
 
-        localStorage.setItem("roomCode", code);
-        localStorage.setItem("playerName", name);
+
+        document.getElementById("players").innerHTML =
+        list || "لا يوجد لاعبين";
 
 
-        document.getElementById("code").innerHTML =
-        "🎉 تم إنشاء القعدة<br><br>" +
-        "🔑 الكود: " + code;
+    });
 
 
-        setTimeout(()=>{
-
-            window.location.href="room.html";
-
-        },2000);
-
-
-    } catch(error){
-
-        console.log(error);
-
-        alert("حدث خطأ");
-
-    }
-
-};
+});
 
 
 
 
 
-// دخول القعدة
+// خروج من القعدة
 
-window.joinGameRoom = async function(){
-
-
-    const name =
-    document.getElementById("joinName").value;
+window.leaveRoom = async function(){
 
 
-    const code =
-    document.getElementById("roomCode").value;
+    if(!roomId){
 
-
-
-    if(name === "" || code === ""){
-
-        alert("اكتب الاسم والكود");
-
+        alert("لم يتم العثور على الغرفة");
         return;
 
     }
 
 
+    if(!playerName){
 
-    const q = query(
-
-        collection(db,"rooms"),
-
-        where(
-            "code",
-            "==",
-            Number(code)
-        )
-
-    );
-
-
-
-    const result = await getDocs(q);
-
-
-
-    if(result.empty){
-
-        document.getElementById("joinResult").innerHTML =
-        "❌ الكود غير موجود";
-
+        alert("اسم اللاعب غير موجود");
         return;
 
     }
-
-
-
-    const roomDoc = result.docs[0];
 
 
 
     await updateDoc(
 
-        doc(db,"rooms",roomDoc.id),
+        doc(db,"rooms",roomId),
 
         {
 
-            players: arrayUnion(name)
+            players: arrayRemove(playerName)
 
         }
 
@@ -166,20 +124,11 @@ window.joinGameRoom = async function(){
 
 
 
-    localStorage.setItem("roomCode", code);
+    localStorage.removeItem("roomCode");
+    localStorage.removeItem("playerName");
 
 
-
-    document.getElementById("joinResult").innerHTML =
-    "✅ تم الدخول للقعدة";
-
-
-    setTimeout(()=>{
-
-        window.location.href="room.html";
-
-    },1500);
-
+    window.location.href="index.html";
 
 
 };
