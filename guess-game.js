@@ -3,6 +3,10 @@ import { db } from "./firebase.js";
 import { randomPlayer } from "./players.js";
 
 import {
+    collection,
+    query,
+    where,
+    getDocs,
     doc,
     getDoc,
     updateDoc,
@@ -18,8 +22,6 @@ const playerName = localStorage.getItem("playerName");
 let roomId = null;
 let myPlayer = null;
 let hearts = 3;
-let usedPlayers = [];
-
 
 
 
@@ -29,10 +31,12 @@ async function loadGame(){
 
 
     const rooms = await getDocs(
+
         query(
             collection(db,"rooms"),
             where("code","==",roomCode)
         )
+
     );
 
 
@@ -56,16 +60,16 @@ async function loadGame(){
 
 
 
-    if(!data.guessGame){
+    if(!data.guessGame || !data.guessGame.players){
 
 
-        startRound();
+        await startRound();
 
 
     }else{
 
 
-        loadPlayer(data.guessGame);
+        loadMyPlayer(data.guessGame);
 
 
     }
@@ -78,20 +82,36 @@ async function loadGame(){
 
 
 
-// بدء جولة جديدة
+
+
+// بدء الجولة
 
 async function startRound(){
 
 
 
-    const player = randomPlayer(usedPlayers);
+    const player1 = randomPlayer([]);
+
+    const player2 = randomPlayer([
+        player1.name
+    ]);
 
 
 
-    myPlayer = player;
+    let players = {};
 
 
-    usedPlayers.push(player.name);
+    players[playerName] = {
+
+
+        name:player1.name,
+
+        image:player1.image,
+
+        hearts:3
+
+
+    };
 
 
 
@@ -101,23 +121,13 @@ async function startRound(){
 
         {
 
-
             guessGame:{
 
-
-                playerName:player.name,
-
-                playerImage:player.image,
-
-
-                hearts:3,
-
+                players:players,
 
                 status:"playing"
 
-
             }
-
 
         }
 
@@ -133,17 +143,36 @@ async function startRound(){
 
 
 
-// عرض اللاعب
 
-function loadPlayer(game){
+
+// تحميل بيانات اللاعب
+
+function loadMyPlayer(game){
+
+
+
+    const me = game.players[playerName];
+
+
+
+    if(!me){
+
+        return;
+
+    }
+
+
+
+    myPlayer = me;
+
+
+
+    hearts = me.hearts;
+
 
 
     document.getElementById("secretPlayerImage").src =
-    game.playerImage;
-
-
-
-    hearts = game.hearts;
+    me.image;
 
 
 
@@ -157,30 +186,38 @@ function loadPlayer(game){
 
 
 
+
+
+
+// القلوب
+
 function showHearts(){
 
 
-    let text="";
+
+    let html="";
 
 
     for(let i=0;i<hearts;i++){
 
-        text+="❤️";
+        html+="❤️";
 
     }
 
 
     for(let i=hearts;i<3;i++){
 
-        text+="🖤";
+        html+="🖤";
 
     }
 
 
-    document.getElementById("hearts").innerHTML=text;
+
+    document.getElementById("hearts").innerHTML=html;
 
 
 }
+
 
 
 
@@ -205,17 +242,21 @@ window.checkGuess = async function(){
 
 
 
-    if(answer==="") return;
+    if(!answer){
+
+        return;
+
+    }
 
 
 
-    const gameRef =
+    const ref =
     doc(db,"rooms",roomId);
 
 
 
     const snap =
-    await getDoc(gameRef);
+    await getDoc(ref);
 
 
 
@@ -224,107 +265,17 @@ window.checkGuess = async function(){
 
 
 
-    const correct =
-    data.guessGame.playerName;
+    const players =
+    data.guessGame.players;
 
 
 
-    if(answer.toLowerCase() === correct.toLowerCase()){
+    let opponent;
 
 
 
-        document.getElementById("gameMessage").innerHTML =
+    for(let p in players){
 
-        "🏆 إجابة صحيحة! أنت الفائز";
+        if(p !== playerName){
 
-
-
-        await updateDoc(
-
-            gameRef,
-
-            {
-
-                "guessGame.status":"finished",
-
-                "guessGame.winner":playerName
-
-            }
-
-        );
-
-
-
-    }else{
-
-
-        hearts--;
-
-
-        showHearts();
-
-
-
-        document.getElementById("gameMessage").innerHTML =
-
-        "❌ خطأ! بقي لديك " + hearts + " قلوب";
-
-
-
-
-        await updateDoc(
-
-            gameRef,
-
-            {
-
-                "guessGame.hearts":hearts
-
-            }
-
-        );
-
-
-
-        if(hearts<=0){
-
-
-            document.getElementById("gameMessage").innerHTML =
-
-            "💔 انتهت قلوبك! الخصم فاز";
-
-
-
-        }
-
-
-    }
-
-
-
-    input.value="";
-
-
-
-};
-
-
-
-
-
-
-
-// جولة جديدة
-
-window.newRound = function(){
-
-
-    startRound();
-
-
-};
-
-
-
-
-loadGame();
+           
