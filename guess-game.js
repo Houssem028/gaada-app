@@ -95,8 +95,63 @@ async function loadGame(){
 
 async function createGame(){
 
+    const snap = await getDocs(
 
-    const player = randomPlayer([]);
+        query(
+            collection(db,"rooms"),
+            where("code","==",roomCode)
+        )
+
+    );
+
+
+    const data = snap.docs[0].data();
+
+
+    const players = data.players || [];
+
+
+    if(players.length < 2){
+
+        document.getElementById("gameMessage").innerHTML =
+        "⏳ نحتاج لاعبين اثنين لبدء اللعبة";
+
+        return;
+
+    }
+
+
+
+    const twoPlayers = getTwoDifferentPlayers();
+
+
+    let gamePlayers = {};
+
+
+
+    gamePlayers[players[0]] = {
+
+        name: twoPlayers.first.name,
+
+        image: twoPlayers.first.image,
+
+        hearts:3
+
+    };
+
+
+
+    gamePlayers[players[1]] = {
+
+        name: twoPlayers.second.name,
+
+        image: twoPlayers.second.image,
+
+        hearts:3
+
+    };
+
+
 
 
 
@@ -106,27 +161,17 @@ async function createGame(){
 
         {
 
+            guessGame:{
 
-            [`guessGame.players.${playerName}`]:{
+                players:gamePlayers,
 
+                status:"playing"
 
-                name:player.name,
-
-                image:player.image,
-
-                hearts:3
-
-
-            },
-
-
-            "guessGame.status":"playing"
-
+            }
 
         }
 
     );
-
 
 }
 
