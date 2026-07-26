@@ -27,8 +27,6 @@ const q = query(
 
 
 
-
-
 onSnapshot(q,(snapshot)=>{
 
 
@@ -69,15 +67,14 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
         let html = "";
 
 
 
-        players.forEach((p,index)=>{
+        players.forEach((p)=>{
 
 
-            if(index === 0){
+            if(p === data.owner){
 
                 html += "👑 " + p + " (المدير)<br>";
 
@@ -98,10 +95,8 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+
         // التحكم بالهوست
-
-        const host = players[0];
-
 
         const hostControls =
         document.getElementById("hostControls");
@@ -112,8 +107,10 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        if(playerName === host){
+        if(playerName === data.owner){
 
+
+            // هوست
 
             hostControls.style.display = "block";
 
@@ -121,14 +118,18 @@ onSnapshot(q,(snapshot)=>{
             waiting.innerHTML =
             "👑 أنت مدير القعدة";
 
+
         }else{
 
+
+            // لاعب
 
             hostControls.style.display = "none";
 
 
             waiting.innerHTML =
             "⏳ بانتظار المدير لاختيار اللعبة";
+
 
         }
 
