@@ -8,7 +8,6 @@ import {
     where,
     getDocs,
     doc,
-    getDoc,
     updateDoc,
     onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
@@ -25,7 +24,8 @@ let hearts = 3;
 
 
 
-// البحث عن القعدة
+
+// جلب الغرفة
 
 async function loadGame(){
 
@@ -43,12 +43,11 @@ async function loadGame(){
     if(rooms.empty){
 
         document.getElementById("gameMessage").innerHTML =
-        "❌ القعدة غير موجودة";
+        "❌ الغرفة غير موجودة";
 
         return;
 
     }
-
 
 
     const room = rooms.docs[0];
@@ -56,20 +55,15 @@ async function loadGame(){
     roomId = room.id;
 
 
+
     const data = room.data();
 
 
 
-    if(!data.guessGame || !data.guessGame.players){
+    if(!data.guessGame){
 
 
-        await startRound();
-
-
-    }else{
-
-
-        loadMyPlayer(data.guessGame);
+        await createGame();
 
 
     }
@@ -82,36 +76,12 @@ async function loadGame(){
 
 
 
+// إنشاء اللعبة
+
+async function createGame(){
 
 
-// بدء الجولة
-
-async function startRound(){
-
-
-
-    const player1 = randomPlayer([]);
-
-    const player2 = randomPlayer([
-        player1.name
-    ]);
-
-
-
-    let players = {};
-
-
-    players[playerName] = {
-
-
-        name:player1.name,
-
-        image:player1.image,
-
-        hearts:3
-
-
-    };
+    const player = randomPlayer([]);
 
 
 
@@ -121,19 +91,91 @@ async function startRound(){
 
         {
 
-            guessGame:{
 
-                players:players,
+            [`guessGame.players.${playerName}`]:{
 
-                status:"playing"
 
-            }
+                name:player.name,
+
+                image:player.image,
+
+                hearts:3
+
+
+            },
+
+
+            "guessGame.status":"playing"
+
 
         }
 
     );
 
 
+}
+
+
+
+
+
+
+
+
+// متابعة اللعبة
+
+function listenGame(){
+
+
+    onSnapshot(
+
+        doc(db,"rooms",roomId),
+
+        (snap)=>{
+
+
+            const data = snap.data();
+
+
+            if(!data.guessGame){
+
+                return;
+
+            }
+
+
+
+            const me =
+            data.guessGame.players[playerName];
+
+
+
+            if(me){
+
+
+                myPlayer = me;
+
+
+                hearts = me.hearts;
+
+
+
+                document.getElementById("secretPlayerImage").src =
+                me.image;
+
+
+
+                showHearts();
+
+
+            }
+
+
+
+        }
+
+    );
+
 
 }
 
@@ -145,54 +187,9 @@ async function startRound(){
 
 
 
-// تحميل بيانات اللاعب
-
-function loadMyPlayer(game){
-
-
-
-    const me = game.players[playerName];
-
-
-
-    if(!me){
-
-        return;
-
-    }
-
-
-
-    myPlayer = me;
-
-
-
-    hearts = me.hearts;
-
-
-
-    document.getElementById("secretPlayerImage").src =
-    me.image;
-
-
-
-    showHearts();
-
-
-}
-
-
-
-
-
-
-
-
-
-// القلوب
+// عرض القلوب
 
 function showHearts(){
-
 
 
     let html="";
@@ -212,8 +209,7 @@ function showHearts(){
     }
 
 
-
-    document.getElementById("hearts").innerHTML=html;
+    document.getElementById("hearts").innerHTML = html;
 
 
 }
@@ -250,18 +246,20 @@ window.checkGuess = async function(){
 
 
 
-    const ref =
-    doc(db,"rooms",roomId);
-
-
-
     const snap =
-    await getDoc(ref);
+    await getDocs(
+
+        query(
+            collection(db,"rooms"),
+            where("code","==",roomCode)
+        )
+
+    );
 
 
 
     const data =
-    snap.data();
+    snap.docs[0].data();
 
 
 
@@ -270,12 +268,152 @@ window.checkGuess = async function(){
 
 
 
-    let opponent;
+    let enemy = null;
 
 
 
     for(let p in players){
 
+
         if(p !== playerName){
 
-           
+            enemy = players[p];
+
+        }
+
+
+    }
+
+
+
+    if(!enemy){
+
+        alert("لا يوجد خصم بعد");
+
+        return;
+
+    }
+
+
+
+
+
+    if(
+        answer.toLowerCase()
+        ===
+        enemy.name.toLowerCase()
+
+    ){
+
+
+        document.getElementById("gameMessage").innerHTML =
+        "🏆 إجابة صحيحة! فزت";
+
+
+    }else{
+
+
+        hearts--;
+
+
+
+        await updateDoc(
+
+            doc(db,"rooms",roomId),
+
+            {
+
+
+                [`guessGame.players.${playerName}.hearts`]:
+                hearts
+
+
+            }
+
+        );
+
+
+
+        document.getElementById("gameMessage").innerHTML =
+        "❌ خطأ! خسرت قلب";
+
+
+        showHearts();
+
+
+
+        if(hearts <= 0){
+
+
+            document.getElementById("gameMessage").innerHTML =
+            "💔 انتهت قلوبك! خسرت";
+
+
+        }
+
+
+    }
+
+
+
+    input.value="";
+
+
+};
+
+
+
+
+
+
+
+
+// جولة جديدة
+
+window.newRound = async function(){
+
+
+    const player =
+    randomPlayer([]);
+
+
+
+    await updateDoc(
+
+        doc(db,"rooms",roomId),
+
+        {
+
+
+            [`guessGame.players.${playerName}`]:{
+
+
+                name:player.name,
+
+                image:player.image,
+
+                hearts:3
+
+
+            }
+
+
+        }
+
+    );
+
+
+};
+
+
+
+
+
+
+loadGame().then(()=>{
+
+
+    listenGame();
+
+
+});
