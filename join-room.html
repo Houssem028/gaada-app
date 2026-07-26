@@ -1,61 +1,90 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+// دخول قعدة بالكود
 
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>دخول قعدة - ڨعدة</title>
-
-<link rel="stylesheet" href="style.css">
-
-</head>
+window.joinGameRoom = async function(){
 
 
-<body>
+    const name = document.getElementById("joinName").value;
+
+    const code = document.getElementById("roomCode").value;
 
 
-<div class="container">
+
+    if(name === "" || code === ""){
+
+        alert("اكتب الاسم والكود");
+
+        return;
+
+    }
 
 
-<div class="logo">
-ڨعدة 🎮
-</div>
+
+    const rooms = collection(db,"rooms");
 
 
-<div class="slogan">
-ادخل كود أصحابك وانضم للقعدة
-</div>
+
+    const q = query(
+
+        rooms,
+
+        where(
+            "code",
+            "==",
+            Number(code)
+        )
+
+    );
 
 
-<input 
-id="joinName"
-class="input"
-placeholder="اسمك">
+
+    const result = await getDocs(q);
 
 
-<input 
-id="roomCode"
-class="input"
-placeholder="كود القعدة"
-type="number">
+
+    if(result.empty){
 
 
-<button class="btn" onclick="joinGameRoom()">
-دخول القعدة
-</button>
+        document.getElementById("joinResult").innerHTML =
+
+        "❌ الكود غير صحيح";
 
 
-<div id="joinResult"></div>
+        return;
+
+    }
 
 
-</div>
+
+    const room = result.docs[0];
 
 
-<script type="module" src="app.js"></script>
+
+    // حفظ بيانات اللاعب والغرفة
+
+    localStorage.setItem("roomCode", code);
+
+    localStorage.setItem("playerName", name);
 
 
-</body>
 
-</html>
+    document.getElementById("joinResult").innerHTML =
+
+    "✅ تم العثور على القعدة<br>" +
+
+    "أهلاً " + name + " 🎮<br>" +
+
+    "جاري الدخول...";
+
+
+
+    setTimeout(()=>{
+
+
+        window.location.href = "room.html";
+
+
+    },1000);
+
+
+
+};
