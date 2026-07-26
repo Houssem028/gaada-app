@@ -45,8 +45,56 @@
 
 
 <div id="players">
-
 لا يوجد لاعبين بعد
+</div>
+
+
+
+
+
+<!-- تحكم الهوست فقط -->
+
+<div id="hostControls" style="display:none;">
+
+
+<button class="btn" onclick="showGames()">
+🎮 اختيار اللعبة
+</button>
+
+
+
+<div id="gameMenu" style="display:none;">
+
+
+<button class="btn" onclick="selectGame('تحديات وأسئلة')">
+🧠 تحديات وأسئلة
+</button>
+
+
+<button class="btn" onclick="selectGame('تخمين اللاعبين')">
+🎯 تخمين اللاعبين
+</button>
+
+
+<button class="btn" onclick="selectGame('أسئلة عامة')">
+❓ أسئلة عامة
+</button>
+
+
+</div>
+
+
+
+<button 
+id="startGameBtn" 
+class="btn" 
+style="display:none;"
+onclick="startGame()">
+
+🚀 بدء اللعبة
+
+</button>
+
 
 </div>
 
@@ -54,17 +102,9 @@
 
 
 
-<!-- اختيار اللعبة للهوست فقط -->
+<div id="gameInfo">
 
-<div id="hostControls" style="display:none;">
-
-
-<button class="btn">
-
-🎮 اختيار اللعبة
-
-</button>
-
+🎮 لم يتم اختيار لعبة بعد
 
 </div>
 
@@ -99,7 +139,6 @@
 
 
 
-
 <div class="chat-input">
 
 
@@ -112,6 +151,7 @@ class="input"
 placeholder="اكتب رسالة...">
 
 
+
 <button class="btn" onclick="sendMessage()">
 
 📩
@@ -120,7 +160,6 @@ placeholder="اكتب رسالة...">
 
 
 </div>
-
 
 
 </div>
