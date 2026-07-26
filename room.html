@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>قعدة - ڨعدة</title>
@@ -24,9 +25,11 @@
 </div>
 
 
+
 <h2 id="roomTitle">
-اسم القعدة
+☕ اسم القعدة
 </h2>
+
 
 
 <div id="roomCode">
@@ -49,21 +52,40 @@
 
 
 
+<!-- يظهر للهوست فقط -->
+
+<div id="hostControls" style="display:none;">
+
 
 <button class="btn">
 🎮 اختيار اللعبة
 </button>
 
 
+</div>
+
+
+
+<!-- يظهر للاعبين -->
+
+<div id="waiting">
+
+</div>
+
+
 
 <button class="btn" onclick="leaveRoom()">
+
 🚪 خروج من القعدة
+
 </button>
 
 
 
 <button class="btn">
+
 💬 الدردشة
+
 </button>
 
 
@@ -71,7 +93,8 @@
 </div>
 
 
-<script type="module" src="room.js"></script>
+
+<script type="module" src="./room.js"></script>
 
 
 </body>
