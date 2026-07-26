@@ -23,7 +23,124 @@ window.createRoom = function(){
 };
 
 
-window.joinRoom = function(){
+// دخول قعدة بالكود
+
+window.joinGameRoom = async function(){
+
+
+    const name = document.getElementById("joinName").value.trim();
+
+    const code = Number(
+        document.getElementById("roomCode").value
+    );
+
+
+
+    if(name === "" || code === 0){
+
+        alert("اكتب الاسم والكود");
+
+        return;
+
+    }
+
+
+
+    try{
+
+
+        const rooms = collection(db,"rooms");
+
+
+
+        const q = query(
+
+            rooms,
+
+            where(
+                "code",
+                "==",
+                code
+            )
+
+        );
+
+
+
+        const result = await getDocs(q);
+
+
+
+        if(result.empty){
+
+
+            document.getElementById("joinResult").innerHTML =
+
+            "❌ الكود غير صحيح";
+
+
+            return;
+
+        }
+
+
+
+        const room = result.docs[0];
+
+
+
+        // حفظ بيانات اللاعب
+
+        localStorage.setItem(
+            "roomCode",
+            code
+        );
+
+
+        localStorage.setItem(
+            "playerName",
+            name
+        );
+
+
+
+        document.getElementById("joinResult").innerHTML =
+
+        "✅ تم العثور على القعدة<br>" +
+
+        "👤 أهلاً " + name + "<br>" +
+
+        "🚀 دخول الغرفة...";
+
+
+
+        // الانتقال للغرفة
+
+        setTimeout(function(){
+
+
+            window.location.href = "./room.html";
+
+
+        },1000);
+
+
+
+    }catch(error){
+
+
+        console.log(error);
+
+
+        document.getElementById("joinResult").innerHTML =
+
+        "❌ خطأ: " + error.message;
+
+
+    }
+
+
+};
 
     window.location.href = "join-room.html";
 
