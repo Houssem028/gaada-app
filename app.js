@@ -13,6 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
+
 // الصفحة الرئيسية
 
 window.createRoom = function(){
@@ -43,13 +44,16 @@ window.games = function(){
 window.createGameRoom = async function(){
 
 
-    const player = document.getElementById("playerName").value;
-
-    const roomName = document.getElementById("roomName").value;
-
+    const player =
+    document.getElementById("playerName").value.trim();
 
 
-    if(player === "" || roomName === ""){
+    const roomName =
+    document.getElementById("roomName").value.trim();
+
+
+
+    if(!player || !roomName){
 
         alert("اكتب اسمك واسم القعدة");
         return;
@@ -58,30 +62,33 @@ window.createGameRoom = async function(){
 
 
 
-    const code = Math.floor(100000 + Math.random() * 900000);
+    const code =
+    Math.floor(100000 + Math.random() * 900000);
 
 
 
     try{
 
 
-        await addDoc(collection(db,"rooms"),{
+        await addDoc(
 
+            collection(db,"rooms"),
 
-            owner: player,
+            {
 
-            roomName: roomName,
+                owner: player,
 
-            code: code,
+                roomName: roomName,
 
-            players:[
-                player
-            ],
+                code: code,
 
-            createdAt: serverTimestamp()
+                players:[player],
 
+                createdAt: serverTimestamp()
 
-        });
+            }
+
+        );
 
 
 
@@ -109,11 +116,9 @@ window.createGameRoom = async function(){
 
     }catch(error){
 
-
         console.log(error);
 
-        alert(error.message);
-
+        alert("خطأ: "+error.message);
 
     }
 
@@ -125,18 +130,25 @@ window.createGameRoom = async function(){
 
 
 
+
+
 // دخول القعدة
 
 window.joinGameRoom = async function(){
 
 
-    const name = document.getElementById("joinName").value;
 
-    const code = Number(document.getElementById("roomCode").value);
+    const name =
+    document.getElementById("joinName").value.trim();
 
 
 
-    if(name === "" || code === 0){
+    const code =
+    Number(document.getElementById("roomCode").value);
+
+
+
+    if(!name || !code){
 
 
         alert("اكتب الاسم والكود");
@@ -147,74 +159,98 @@ window.joinGameRoom = async function(){
 
 
 
-    const q = query(
-
-        collection(db,"rooms"),
-
-        where("code","==",code)
-
-    );
+    try{
 
 
+        const q = query(
 
-    const result = await getDocs(q);
+            collection(db,"rooms"),
+
+            where("code","==",code)
+
+        );
 
 
 
-    if(result.empty){
+        const result = await getDocs(q);
+
+
+
+        if(result.empty){
+
+
+            document.getElementById("joinResult").innerHTML =
+            "❌ القعدة غير موجودة";
+
+
+            return;
+
+        }
+
+
+
+        const roomDoc = result.docs[0];
+
+
+
+        // إضافة اللاعب للغرفة
+
+        await updateDoc(
+
+            doc(db,"rooms",roomDoc.id),
+
+            {
+
+                players: arrayUnion(name)
+
+            }
+
+        );
+
+
+
+        // حفظ البيانات
+
+        localStorage.setItem(
+            "roomCode",
+            code
+        );
+
+
+        localStorage.setItem(
+            "playerName",
+            name
+        );
+
 
 
         document.getElementById("joinResult").innerHTML =
 
-        "❌ الكود غير صحيح";
+        "✅ تم الدخول للقعدة<br>" +
+
+        "جاري فتح الغرفة...";
 
 
-        return;
+
+        setTimeout(()=>{
+
+
+            window.location.href="room.html";
+
+
+        },1000);
+
+
+
+    }catch(error){
+
+
+        console.log(error);
+
+        alert("خطأ في الدخول: "+error.message);
+
 
     }
-
-
-
-    const room = result.docs[0];
-
-
-
-    await updateDoc(
-
-        doc(db,"rooms",room.id),
-
-        {
-
-            players: arrayUnion(name)
-
-        }
-
-    );
-
-
-
-    localStorage.setItem("roomCode",code);
-
-    localStorage.setItem("playerName",name);
-
-
-
-    document.getElementById("joinResult").innerHTML =
-
-    "✅ تم العثور على القعدة<br>" +
-
-    "جاري الدخول...";
-
-
-
-    setTimeout(()=>{
-
-
-        window.location.href="room.html";
-
-
-    },1000);
-
 
 
 };
