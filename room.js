@@ -1,19 +1,16 @@
 import { db } from "./firebase.js";
 
 import {
-import {
     collection,
     query,
     where,
     onSnapshot,
     updateDoc,
     doc,
-    getDoc,
     arrayRemove,
     addDoc,
     orderBy,
     serverTimestamp
-}
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
@@ -53,7 +50,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-        // دخول اللعبة تلقائيا
+        // دخول اللعبة
 
         if(
             data.gameStatus === "started" &&
@@ -73,10 +70,6 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
-
-        // معلومات القعدة
-
         document.getElementById("roomTitle").innerHTML =
         "☕ " + data.roomName;
 
@@ -87,10 +80,6 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
-
-
-        // اللاعبين
 
         const players = data.players || [];
 
@@ -132,9 +121,6 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
-        // تحكم الهوست
-
         const hostControls =
         document.getElementById("hostControls");
 
@@ -147,38 +133,23 @@ onSnapshot(q,(snapshot)=>{
         if(playerName === data.owner){
 
 
-            if(hostControls){
-
+            if(hostControls)
                 hostControls.style.display="block";
 
-            }
 
-
-            if(waiting){
-
-                waiting.innerHTML =
-                "👑 أنت مدير القعدة";
-
-            }
-
+            if(waiting)
+                waiting.innerHTML="👑 أنت مدير القعدة";
 
 
         }else{
 
 
-            if(hostControls){
-
+            if(hostControls)
                 hostControls.style.display="none";
 
-            }
 
-
-            if(waiting){
-
-                waiting.innerHTML =
-                "⏳ بانتظار المدير";
-
-            }
+            if(waiting)
+                waiting.innerHTML="⏳ بانتظار المدير";
 
 
         }
@@ -189,9 +160,6 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
-
-        // عرض اللعبة
 
         const gameInfo =
         document.getElementById("gameInfo");
@@ -203,21 +171,18 @@ onSnapshot(q,(snapshot)=>{
 
             if(data.game){
 
-
                 gameInfo.innerHTML =
-                "🎮 اللعبة الحالية: <b>"
-                + data.game +
+                "🎮 اللعبة الحالية: <b>" +
+                data.game +
                 "</b>";
 
-
             }else{
-
 
                 gameInfo.innerHTML =
                 "🎮 لم يتم اختيار لعبة بعد";
 
-
             }
+
 
         }
 
@@ -227,8 +192,6 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
-        // زر بدء اللعبة
 
         const startBtn =
         document.getElementById("startGameBtn");
@@ -243,15 +206,11 @@ onSnapshot(q,(snapshot)=>{
                 playerName === data.owner
             ){
 
-
                 startBtn.style.display="block";
-
 
             }else{
 
-
                 startBtn.style.display="none";
-
 
             }
 
@@ -262,9 +221,6 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-
-
-        // تحميل الدردشة
 
         if(!chatLoaded){
 
@@ -289,14 +245,11 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-// فتح قائمة الألعاب
-
 window.showGames=function(){
 
 
     const menu =
     document.getElementById("gameMenu");
-
 
 
     if(menu){
@@ -316,17 +269,12 @@ window.showGames=function(){
 
 
 
-// اختيار اللعبة
-
 window.selectGame = async function(game){
 
 
 
-    if(!roomId){
-
+    if(!roomId)
         return;
-
-    }
 
 
 
@@ -351,12 +299,8 @@ window.selectGame = async function(game){
 
 
 
-    if(menu){
-
+    if(menu)
         menu.style.display="none";
-
-    }
-
 
 
 };
@@ -368,70 +312,13 @@ window.selectGame = async function(game){
 
 
 
-
-// بدء اللعبة
 
 window.startGame = async function(){
 
 
-    if(!roomId){
 
+    if(!roomId)
         return;
-
-    }
-
-
-
-    // جلب بيانات الغرفة للتأكد من عدد اللاعبين
-
-    const snap = await getDoc(
-        doc(db,"rooms",roomId)
-    );
-
-
-    const data = snap.data();
-
-
-    const players = data.players || [];
-
-
-
-    if(players.length < 2){
-
-
-        alert("⚠️ تحتاج لاعبين اثنين لبدء لعبة التخمين");
-
-
-        return;
-
-    }
-
-
-
-    await updateDoc(
-
-        doc(db,"rooms",roomId),
-
-        {
-
-            gameStatus:"started",
-
-            currentGame:"guess"
-
-        }
-
-    );
-
-
-};
-
-
-
-    if(!roomId){
-
-        return;
-
-    }
 
 
 
@@ -451,9 +338,6 @@ window.startGame = async function(){
 
 
 
-    window.location.href="guess-game.html";
-
-
 };
 
 
@@ -463,36 +347,26 @@ window.startGame = async function(){
 
 
 
-
-// تحميل الرسائل
 
 function loadMessages(id){
 
 
 
-    const messagesRef = collection(
-
+    const messagesRef =
+    collection(
         db,
-
         "rooms",
-
         id,
-
         "messages"
-
     );
 
 
 
-    const q = query(
-
+    const q =
+    query(
         messagesRef,
-
         orderBy("time","asc")
-
     );
-
-
 
 
 
@@ -540,7 +414,6 @@ function loadMessages(id){
         }
 
 
-
     });
 
 
@@ -553,8 +426,6 @@ function loadMessages(id){
 
 
 
-
-// إرسال رسالة
 
 window.sendMessage = async function(){
 
@@ -570,11 +441,8 @@ window.sendMessage = async function(){
 
 
 
-    if(!text || !roomId){
-
+    if(!text || !roomId)
         return;
-
-    }
 
 
 
@@ -614,17 +482,12 @@ window.sendMessage = async function(){
 
 
 
-// الخروج
-
 window.leaveRoom = async function(){
 
 
 
-    if(!roomId){
-
+    if(!roomId)
         return;
-
-    }
 
 
 
