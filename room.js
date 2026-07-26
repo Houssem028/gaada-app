@@ -1,16 +1,19 @@
 import { db } from "./firebase.js";
 
 import {
+import {
     collection,
     query,
     where,
     onSnapshot,
     updateDoc,
     doc,
+    getDoc,
     arrayRemove,
     addDoc,
     orderBy,
     serverTimestamp
+}
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
