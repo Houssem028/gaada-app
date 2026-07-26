@@ -11,8 +11,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 
+
 const roomCode = Number(localStorage.getItem("roomCode"));
 const playerName = localStorage.getItem("playerName");
+
 
 let roomId = null;
 
@@ -25,11 +27,15 @@ const q = query(
 
 
 
+
+
 onSnapshot(q,(snapshot)=>{
 
 
     if(snapshot.empty){
+
         return;
+
     }
 
 
@@ -63,6 +69,7 @@ onSnapshot(q,(snapshot)=>{
 
 
 
+
         let html = "";
 
 
@@ -89,6 +96,44 @@ onSnapshot(q,(snapshot)=>{
         html || "لا يوجد لاعبين";
 
 
+
+
+        // التحكم بالهوست
+
+        const host = players[0];
+
+
+        const hostControls =
+        document.getElementById("hostControls");
+
+
+        const waiting =
+        document.getElementById("waitingMessage");
+
+
+
+        if(playerName === host){
+
+
+            hostControls.style.display = "block";
+
+
+            waiting.innerHTML =
+            "👑 أنت مدير القعدة";
+
+        }else{
+
+
+            hostControls.style.display = "none";
+
+
+            waiting.innerHTML =
+            "⏳ بانتظار المدير لاختيار اللعبة";
+
+        }
+
+
+
     });
 
 
@@ -98,13 +143,30 @@ onSnapshot(q,(snapshot)=>{
 
 
 
-// حذف اللاعب
-
-async function removePlayer(){
 
 
-    if(!roomId || !playerName){
+// خروج من القعدة
+
+window.leaveRoom = async function(){
+
+
+
+    if(!roomId){
+
+        alert("الغرفة غير جاهزة");
+
         return;
+
+    }
+
+
+
+    if(!playerName){
+
+        alert("اسم اللاعب غير موجود");
+
+        return;
+
     }
 
 
@@ -125,46 +187,25 @@ async function removePlayer(){
         );
 
 
+
+        localStorage.removeItem("roomCode");
+
+        localStorage.removeItem("playerName");
+
+
+
+        window.location.href="index.html";
+
+
+
     }catch(error){
 
+
         console.log(error);
+
+        alert("حدث خطأ في الخروج");
 
     }
 
 
-}
-
-
-
-
-
-// زر الخروج
-
-window.leaveRoom = async function(){
-
-
-    await removePlayer();
-
-
-    localStorage.removeItem("roomCode");
-
-    localStorage.removeItem("playerName");
-
-
-    window.location.href="index.html";
-
-
 };
-
-
-
-
-// محاولة حذف اللاعب عند إغلاق الصفحة
-
-window.addEventListener("beforeunload",()=>{
-
-
-    removePlayer();
-
-
-});
